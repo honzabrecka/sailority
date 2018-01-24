@@ -220,7 +220,7 @@ const Boat = ({ scale, size, type, handlers, sailRotation }) => {
     left: 0,
     width: sailHeight,
     height: sailWidth,
-    transform: [{rotate: `${sailRotation - (Math.PI * 0.5)}rad`}]
+    transform: [{rotate: `${sailRotation}rad`}]
   }
   const sailStyle = {
     position: 'absolute',
@@ -277,7 +277,7 @@ function computeWindDistance({windDistance, windRotation, boatDistance, boatRota
 }
 
 function computeSailRotation(windRotation, boatRotation) {
-  return (Math.PI * 0.5) - (normalizeRotation(windRotation - boatRotation) * 0.5)
+  return (normalizeRotation((windRotation + Math.PI) - boatRotation) * 0.5)
 }
 
 export default class App extends Component {
