@@ -381,7 +381,9 @@ export default class App extends Component {
                   windRotation,
                   boatDistance: boat1Distance,
                   boatRotation: boat1Rotation
-                })
+                }),
+                boat1SailRotation: computeSailRotation(windRotation, boat1Rotation),
+                boat2SailRotation: computeSailRotation(windRotation, boat2Rotation)
               })
             }}
             onDoubleTap={() => this.setState({boat1Type: !boat1Type})}/>
@@ -400,7 +402,9 @@ export default class App extends Component {
                   windRotation,
                   boatDistance: boat2Distance,
                   boatRotation: boat2Rotation
-                })
+                }),
+                boat1SailRotation: computeSailRotation(windRotation, boat1Rotation),
+                boat2SailRotation: computeSailRotation(windRotation, boat2Rotation)
               })
             }}
             onDoubleTap={() => this.setState({boat2Type: !boat2Type})}/>
