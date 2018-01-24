@@ -60,20 +60,29 @@ const Circle = ({ scale, center, size, rotation = 0, circle, sector }) => {
   )
 }
 
-class Arrows extends Component {
-
-  render() {
-    return (
-      <View>
-        <ArrowVector/>
-        <ArrowVector/>
-        <ArrowVector/>
-        <ArrowVector/>
-        <ArrowVector/>
-      </View>
-    )
+const Arrows = ({ scale, center }) => {
+  const [centerX, centerY] = center
+  const size = 0.6
+  const originalWidth = 46 * size
+  const originalHeight = 110.65 * size
+  const style = {
+    position: 'absolute',
+    left: centerX - (originalWidth * scale * 0.5),
+    top: centerY - (originalWidth * scale * 0.5),
+    transform: [{rotate: `${0}rad`}]
   }
-
+  return (
+    <View style={style}>
+      <ArrowVector
+        width={(originalWidth * scale)}
+        height={(originalHeight * scale)}
+        fills={[
+          'rgba(255, 255, 255, 0.8)',
+          'rgba(255, 255, 255, 0.6)',
+          'rgba(255, 255, 255, 0.3)'
+        ]} />
+    </View>
+  )
 }
 
 const rotable = (Wrapped) => {
@@ -332,6 +341,7 @@ export default class App extends Component {
             circle={false}
             sector={true}
             rotation={boat2Rotation}/>
+          <Arrows/>
           <RotableWind
             size={0.08}
             distanceFromCenter={windDistance}

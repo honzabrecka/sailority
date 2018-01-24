@@ -15,12 +15,17 @@ import Svg, {
   Defs
 } from 'react-native-svg'
 
-export default class BoatVector extends Component {
+export default class ArrowVector extends Component {
 
   render() {
-    const {width, height, color} = this.props
+    const {width, height, fills} = this.props
+    const [a, b, c] = fills
     return (
-      <Svg width={width} height={height} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#000000"><Path d="M 64.00,416.00l 96.00,96.00l 256.00-256.00L 160.00,0.00L 64.00,96.00l 160.00,160.00L 64.00,416.00z" ></Path></Svg>
+      <Svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 46 110.65">
+        <Path d="M37.38,110.65L46,102,23,79,0,102l8.63,8.63L23,96.28Z" fill={a}/>
+        <Path d="M37.38,71.14L46,62.51l-23-23-23,23,8.63,8.63L23,56.76Z" fill={b}/>
+        <Path d="M37.38,31.63L46,23,23,0,0,23l8.63,8.63L23,17.25Z" fill={c}/>
+      </Svg>
     )
   }
 
