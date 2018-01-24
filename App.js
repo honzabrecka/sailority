@@ -277,7 +277,7 @@ function computeWindDistance({windDistance, windRotation, boatDistance, boatRota
 }
 
 function computeSailRotation(windRotation, boatRotation) {
-  return (normalizeRotation((windRotation + Math.PI) - boatRotation) * 0.5)
+  return normalizeRotation((windRotation + Math.PI) - boatRotation) * 0.5
 }
 
 export default class App extends Component {
