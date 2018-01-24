@@ -21,55 +21,43 @@ function normalizeRotation(r) {
   return r - TWO_PI * Math.floor((r + Math.PI) / TWO_PI)
 }
 
-class Sea extends Component {
-
-  originalSize = 342
-
-  render() {
-    const {center, screenWidth, screenHeight, rotation = 0} = this.props
-    const [centerX, centerY] = center
-    const screenDiagonal = Math.sqrt(screenWidth * screenWidth + screenHeight * screenHeight)
-    const scale = screenDiagonal / this.originalSize
-    const scaledSize = this.originalSize * scale
-    const style = {
-      position: 'absolute',
-      left: centerX - (scaledSize * 0.5),
-      top: centerY - (scaledSize * 0.5),
-      transform: [{rotate: `${rotation}rad`}],
-      width: scaledSize,
-      height: scaledSize,
-      backgroundColor: 'rgba(14, 175, 224, 0.83)'
-    }
-    return (
-      <View style={style}>
-        <SeaVector size={scaledSize}/>
-      </View>
-    )
+const Sea = ({ center, screenWidth, screenHeight, rotation = 0 }) => {
+  const originalSize = 342
+  const [centerX, centerY] = center
+  const screenDiagonal = Math.sqrt(screenWidth * screenWidth + screenHeight * screenHeight)
+  const scale = screenDiagonal / originalSize
+  const scaledSize = originalSize * scale
+  const style = {
+    position: 'absolute',
+    left: centerX - (scaledSize * 0.5),
+    top: centerY - (scaledSize * 0.5),
+    transform: [{rotate: `${rotation}rad`}],
+    width: scaledSize,
+    height: scaledSize,
+    backgroundColor: 'rgba(14, 175, 224, 0.83)'
   }
-
+  return (
+    <View style={style}>
+      <SeaVector size={scaledSize}/>
+    </View>
+  )
 }
 
-class Circle extends Component {
-
-  originalSize = 200
-
-  render() {
-    const {scale, center, size, rotation = 0, circle, sector} = this.props
-    const [centerX, centerY] = center
-    const scaledSize = this.originalSize * scale * size
-    const style = {
-      position: 'absolute',
-      left: centerX - (scaledSize * 0.5),
-      top: centerY - (scaledSize * 0.5),
-      transform: [{rotate: `${rotation + (Math.PI * 4 / 5)}rad`}]
-    }
-    return (
-      <View style={style}>
-        <CircleVector size={scaledSize} scale={size} circle={circle} sector={sector}/>
-      </View>
-    )
+const Circle = ({ scale, center, size, rotation = 0, circle, sector }) => {
+  const originalSize = 200
+  const [centerX, centerY] = center
+  const scaledSize = originalSize * scale * size
+  const style = {
+    position: 'absolute',
+    left: centerX - (scaledSize * 0.5),
+    top: centerY - (scaledSize * 0.5),
+    transform: [{rotate: `${rotation + (Math.PI * 4 / 5)}rad`}]
   }
-
+  return (
+    <View style={style}>
+      <CircleVector size={scaledSize} scale={size} circle={circle} sector={sector}/>
+    </View>
+  )
 }
 
 class Arrows extends Component {
@@ -192,104 +180,86 @@ const rotable = (Wrapped) => {
 
 }
 
-class _Wind extends Component {
-
-  originalSize = 512
-
-  render() {
-    const {scale, size, handlers} = this.props
-    const scaledSize = this.originalSize * scale * size
-    const style = {
-      position: 'absolute',
-      left: scaledSize * -0.5,
-      top: scaledSize * -0.5,
-      width: scaledSize,
-      height: scaledSize,
-      transform: [{rotate: '-90deg'}]
-    }
-
-    return (
-      <View style={style} {...handlers}>
-        <WindVector width={scaledSize} height={scaledSize}/>
-      </View>
-    )
+const Wind = ({ scale, size, handlers }) => {
+  const originalSize = 512
+  const scaledSize = originalSize * scale * size
+  const style = {
+    position: 'absolute',
+    left: scaledSize * -0.5,
+    top: scaledSize * -0.5,
+    width: scaledSize,
+    height: scaledSize,
+    transform: [{rotate: '-90deg'}]
   }
 
+  return (
+    <View style={style} {...handlers}>
+      <WindVector width={scaledSize} height={scaledSize}/>
+    </View>
+  )
 }
 
-class _Boat extends Component {
-
-  originalWidth = 592
-  originalHeight = 152
-
-  render() {
-    const {scale, size, type, handlers, sailRotation} = this.props
-    const scaledWidth = this.originalWidth * scale * size
-    const scaledHeight = this.originalHeight * scale * size
-    const boatStyle = {
-      position: 'absolute',
-      left: scaledWidth * -0.5,
-      top: scaledHeight * -0.5,
-      width: scaledWidth,
-      height: scaledHeight,
-      transform: [{rotate: '-90deg'}]
-    }
-    const sailWidth = 20 * scale * size
-    const sailHeight = 300 * scale * size * 2
-    const sailHolderStyle = {
-      position: 'absolute',
-      top: (scaledHeight - sailWidth) * 0.5,
-      left: 0,
-      width: sailHeight,
-      height: sailWidth,
-      transform: [{rotate: `${Math.PI * -0.5}rad`}]
-    }
-    const sailStyle = {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: sailHeight * 0.5,
-      height: sailWidth,
-      backgroundColor: '#cc0000'
-    }
-
-    return (
-      <View style={boatStyle} {...handlers} onPress={() => console.log('press')}>
-        <BoatVector width={scaledWidth} height={scaledHeight} color="#ffffff"/>
-        {type && <View style={sailHolderStyle}>
-          <View style={sailStyle}></View>
-        </View>}
-      </View>
-    )
+const Boat = ({ scale, size, type, handlers, sailRotation }) => {
+  const originalWidth = 592
+  const originalHeight = 152
+  const scaledWidth = originalWidth * scale * size
+  const scaledHeight = originalHeight * scale * size
+  const boatStyle = {
+    position: 'absolute',
+    left: scaledWidth * -0.5,
+    top: scaledHeight * -0.5,
+    width: scaledWidth,
+    height: scaledHeight,
+    transform: [{rotate: '-90deg'}]
+  }
+  const sailWidth = 20 * scale * size
+  const sailHeight = 300 * scale * size * 2
+  const sailHolderStyle = {
+    position: 'absolute',
+    top: (scaledHeight - sailWidth) * 0.5,
+    left: 0,
+    width: sailHeight,
+    height: sailWidth,
+    transform: [{rotate: `${sailRotation - (Math.PI * 0.5)}rad`}]
+  }
+  const sailStyle = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: sailHeight * 0.5,
+    height: sailWidth,
+    backgroundColor: '#cc0000'
   }
 
+  return (
+    <View style={boatStyle} {...handlers} onPress={() => console.log('press')}>
+      <BoatVector width={scaledWidth} height={scaledHeight} color="#ffffff"/>
+      {type && <View style={sailHolderStyle}>
+        <View style={sailStyle}></View>
+      </View>}
+    </View>
+  )
 }
 
-const Wind = rotable(_Wind)
+const RotableWind = rotable(Wind)
 
-const Boat = rotable(_Boat)
+const RotableBoat = rotable(Boat)
 
-class ScalableSquare extends Component {
-
-  originalSize = 375
-
-  render() {
-    const {screenWidth, screenHeight, children} = this.props
-    const width = Math.min(screenWidth, screenHeight)
-    const scale = width / this.originalSize
-    const center = [this.originalSize * scale * 0.5, this.originalSize * scale * 0.5]
-    const style = {
-      width: width,
-      height: width
-    }
-    return(
-      <View style={style}>
-        {React.Children.map(children, (child) =>
-          React.cloneElement(child, {scale, center, screenWidth, screenHeight}))}
-      </View>
-    )
+const ScalableSquare = ({ screenWidth, screenHeight, children }) => {
+  const originalSize = 375
+  const width = Math.min(screenWidth, screenHeight)
+  const scale = width / originalSize
+  const center = [originalSize * scale * 0.5, originalSize * scale * 0.5]
+  const style = {
+    width: width,
+    height: width
   }
-
+  return(
+    <View style={style}>
+      {React.Children.map(children, (child) =>
+        React.cloneElement(child, {scale, center, screenWidth, screenHeight}))}
+    </View>
+  )
 }
 
 const SAIL = true
@@ -362,7 +332,7 @@ export default class App extends Component {
             circle={false}
             sector={true}
             rotation={boat2Rotation}/>
-          <Wind
+          <RotableWind
             size={0.08}
             distanceFromCenter={windDistance}
             rotation={windRotation}
@@ -386,7 +356,7 @@ export default class App extends Component {
                 boat2SailRotation: computeSailRotation(windRotation, boat2Rotation)
               })
             }}/>
-          <Boat
+          <RotableBoat
             size={0.12}
             distanceFromCenter={boat1Distance}
             type={boat1Type}
@@ -405,7 +375,7 @@ export default class App extends Component {
               })
             }}
             onDoubleTap={() => this.setState({boat1Type: !boat1Type})}/>
-          <Boat
+          <RotableBoat
             size={0.12}
             distanceFromCenter={boat2Distance}
             type={boat2Type}
