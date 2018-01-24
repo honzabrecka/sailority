@@ -289,22 +289,31 @@ function computeSailRotation(windRotation, boatRotation) {
   return normalizeRotation((windRotation + Math.PI) - boatRotation) * 0.5
 }
 
+const initialState = {
+  windRotation: 0,
+  windDistance: 160,
+  boat1Rotation: Math.PI * 0.5,
+  boat1SailRotation: 0,
+  boat1Type: SAIL,
+  boat1Distance: 97,
+  boat1WindDistance: 0,
+  boat2Rotation: 0,
+  boat2SailRotation: 0,
+  boat2Type: MOTOR,
+  boat2Distance: 97,
+  boat2WindDistance: 0
+}
+
 export default class App extends Component {
 
-  state = {
-    windRotation: 0,
-    windDistance: 160,
-    boat1Rotation: Math.PI * 0.5,
-    boat1SailRotation: 0,
-    boat1Type: SAIL,
-    boat1Distance: 97,
-    boat1WindDistance: 0,
-    boat2Rotation: 0,
-    boat2SailRotation: 0,
-    boat2Type: MOTOR,
-    boat2Distance: 97,
-    boat2WindDistance: 0
-  }
+  state = ((state) => {
+    const { windRotation, boat1Rotation, boat2Rotation } = state
+    return {
+      ...state,
+      boat1SailRotation: computeSailRotation(windRotation, boat1Rotation),
+      boat2SailRotation: computeSailRotation(windRotation, boat2Rotation)
+    }
+  })(initialState)
 
   render() {
     const {
