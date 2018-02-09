@@ -60,16 +60,16 @@ const Circle = ({ scale, center, size, rotation = 0, circle, sector }) => {
   )
 }
 
-const Arrows = ({ scale, center }) => {
+const Arrows = ({ scale, center, rotation }) => {
   const [centerX, centerY] = center
-  const size = 0.6
+  const size = 0.8
   const originalWidth = 46 * size
   const originalHeight = 110.65 * size
   const style = {
     position: 'absolute',
     left: centerX - (originalWidth * scale * 0.5),
-    top: centerY - (originalWidth * scale * 0.5),
-    transform: [{rotate: `${0}rad`}]
+    top: centerY - (originalHeight * scale * 0.5),
+    transform: [{rotate: `${rotation}rad`}]
   }
   return (
     <View style={style}>
@@ -289,6 +289,21 @@ function computeSailRotation(windRotation, boatRotation) {
   return normalizeRotation((windRotation + Math.PI) - boatRotation) * 0.5
 }
 
+function priority({
+  boat1Type,
+  boat2Type,
+  boat1Rotation,
+  boat2Rotation,
+  boat1SailRotation,
+  boat2SailRotation,
+  boat1WindDistance,
+  boat2WindDistance,
+}) {
+  if (boat1Type === MOTOR && boat2Type === SAIL) return 2
+  if (boat2Type === MOTOR && boat1Type === SAIL) return 1
+  return 1
+}
+
 const initialState = {
   windRotation: 0,
   windDistance: 160,
@@ -350,7 +365,7 @@ export default class App extends Component {
             circle={false}
             sector={true}
             rotation={boat2Rotation}/>
-          <Arrows/>
+          <Arrows rotation={priority(this.state) === 1 ? boat1Rotation : boat2Rotation}/>
           <RotableWind
             size={0.08}
             distanceFromCenter={windDistance}
