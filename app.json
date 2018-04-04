@@ -3,7 +3,7 @@
     "name": "sailority",
     "description": "This project is really great.",
     "slug": "sailority",
-    "privacy": "public",
+    "privacy": "unlisted",
     "sdkVersion": "25.0.0",
     "platforms": ["ios", "android"],
     "version": "1.0.0",
