@@ -51,7 +51,7 @@ const Circle = ({
     position: 'absolute',
     left: centerX - (scaledSize * 0.5),
     top: centerY - (scaledSize * 0.5),
-    transform: [{ rotate: `${rotation + ((Math.PI * 4) / 5)}rad` }],
+    transform: [{ rotate: `${rotation}rad` }],
   }
   return (
     <View style={style}>
@@ -86,6 +86,59 @@ const Arrows = ({ scale, center, rotation }) => {
   )
 }
 
+const DoubleArrows = ({ scale, center, rotation }) => {
+  const [centerX, centerY] = center
+  const size = 0.6
+  const originalWidth = 46 * size
+  const originalHeight = 110.65 * size
+  const style = {
+    position: 'absolute',
+    left: centerX - (originalWidth * scale * 0.5),
+    top: centerY - (originalHeight * scale * 0.5),
+    width: originalWidth * scale,
+    height: originalHeight * scale,
+    transform: [{ rotate: `${rotation + (Math.PI / 4)}rad` }],
+  }
+  const d = 20
+  const style1 = {
+    position: 'absolute',
+    left: +(scale * d),
+    top: 0,
+  }
+  const style2 = {
+    position: 'absolute',
+    left: -(scale * d),
+    top: 0,
+    transform: [{ rotate: `${Math.PI}rad` }],
+  }
+  return (
+    <View style={style}>
+      <View style={style1}>
+        <ArrowVector
+          width={(originalWidth * scale)}
+          height={(originalHeight * scale)}
+          fills={[
+            'rgba(255, 255, 255, 0.8)',
+            'rgba(255, 255, 255, 0.6)',
+            'rgba(255, 255, 255, 0.3)',
+          ]}
+        />
+      </View>
+      <View style={style2}>
+        <ArrowVector
+          width={(originalWidth * scale)}
+          height={(originalHeight * scale)}
+          fills={[
+            'rgba(255, 255, 255, 0.8)',
+            'rgba(255, 255, 255, 0.6)',
+            'rgba(255, 255, 255, 0.3)',
+          ]}
+        />
+      </View>
+    </View>
+  )
+}
+
 const rotable = Wrapped => class Rotable extends Component {
     d = Math.PI * 1.5
 
@@ -113,6 +166,7 @@ const rotable = Wrapped => class Rotable extends Component {
     }
 
     handleStartShouldSetPanResponder() {
+      console.log('start')
       this.setState({ tapStart: Date.now() })
       return true
     }
@@ -127,9 +181,10 @@ const rotable = Wrapped => class Rotable extends Component {
 
     handlePanResponderMove(event, gestureState) {
       const { screenWidth, screenHeight, onChange } = this.props
+      const { moveX, moveY } = gestureState
       const rotation = normalizeRotation(this.d + Math.atan2(
-        gestureState.moveY - (screenHeight * 0.5),
-        gestureState.moveX - (screenWidth * 0.5),
+        moveY - (screenHeight * 0.5),
+        moveX - (screenWidth * 0.5),
       ))
       onChange && onChange(rotation)
     }
@@ -141,15 +196,17 @@ const rotable = Wrapped => class Rotable extends Component {
         dx, dy, moveX, moveY, vx, vy,
       } = gestureState
       const now = Date.now()
+      console.log('end', dx, dy, moveX, moveY, vx, vy)
 
       if (dx === 0 && dy === 0
-        && moveX === 0 && moveY === 0
+        // && moveX === 0 && moveY === 0
         && vx === 0 && vy === 0
-        && now - tapStart <= 100) {
-        this.setState({ firstTap: Date.now() })
+        && now - tapStart <= 150) {
+        console.log('tap', now - firstTap)
+        this.setState({ firstTap: tapStart })
         onTap && onTap()
 
-        if (now - firstTap <= 200) { onDoubleTap && onDoubleTap() }
+        if (now - firstTap <= 300) { console.log('ttap'); onDoubleTap && onDoubleTap() }
       }
     }
 
@@ -267,7 +324,7 @@ const ScalableSquare = ({ screenWidth, screenHeight, children }) => {
   return (
     <View style={style}>
       {React.Children.map(children, child =>
-        React.cloneElement(child, {
+        child && React.cloneElement(child, {
  scale, center, screenWidth, screenHeight,
 }))}
     </View>
@@ -288,32 +345,63 @@ function computeSailRotation(windRotation, boatRotation) {
   return normalizeRotation((windRotation + Math.PI) - boatRotation) * 0.5
 }
 
+function rad2deg(angle) {
+  // <0; 360)
+  return (angle * 57.29577951308232) + 180
+}
+
+function sailOrientation(angle) {
+  const r = rad2deg(angle)
+  // 1 = right
+  // 2 = left
+  return (r >= 90 && r <= 180) ? 1 : 2
+}
+
 function priority({
   boat1Type,
   boat2Type,
   // boat1Rotation,
-  // boat2Rotation,
-  // boat1SailRotation,
-  // boat2SailRotation,
-  // boat1WindDistance,
-  // boat2WindDistance,
+  boat2Rotation,
+  boat1SailRotation,
+  boat2SailRotation,
+  boat1WindDistance,
+  boat2WindDistance,
 }) {
+  const r = rad2deg(boat2Rotation)
+
+  console.log(r, boat2Rotation)
+
+  if ((r >= (360 - 25) && r <= 360) || (r >= 0 && r <= (0 + 25))) return 3
   if (boat1Type === MOTOR && boat2Type === SAIL) return 2
   if (boat2Type === MOTOR && boat1Type === SAIL) return 1
+  if (boat1Type === MOTOR && boat2Type === MOTOR) {
+    // boat on the right side goes first
+    return (r > (0 + 25) && r < (180 - 35)) ? 2 : 1
+  }
+  if (boat1Type === SAIL && boat2Type === SAIL) {
+    const boat1SailOrientation = sailOrientation(boat1SailRotation)
+    const boat2SailOrientation = sailOrientation(boat2SailRotation)
+    console.log(rad2deg(boat1SailRotation), rad2deg(boat2SailRotation))
+
+    if (boat1SailOrientation !== boat2SailOrientation) {
+      return boat1SailOrientation === 1 ? 2 : 1
+    }
+    return boat1WindDistance > boat2WindDistance ? 1 : 2
+  }
   return 1
 }
 
 const initialState = {
   windRotation: 0,
   windDistance: 160,
-  boat1Rotation: Math.PI * 0.5,
+  boat1Rotation: 0,
   boat1SailRotation: 0,
   boat1Type: SAIL,
   boat1Distance: 97,
   boat1WindDistance: 0,
-  boat2Rotation: 0,
+  boat2Rotation: Math.PI * 0.5,
   boat2SailRotation: 0,
-  boat2Type: MOTOR,
+  boat2Type: SAIL,
   boat2Distance: 97,
   boat2WindDistance: 0,
 }
@@ -344,6 +432,7 @@ export default class App extends Component {
       // boat2WindDistance,
     } = this.state
     const { width, height } = Dimensions.get('window')
+    const p = priority(this.state)
 
     return (
       <View style={styles.container}>
@@ -354,8 +443,11 @@ export default class App extends Component {
           />
           <Circle
             size={1.1}
+            circle={false}
+            sector
+            rotation={Math.PI + ((7 * Math.PI) / 36)}
           />
-          <Circle
+          {/* <Circle
             size={1.1}
             circle={false}
             sector
@@ -366,8 +458,9 @@ export default class App extends Component {
             circle={false}
             sector
             rotation={boat2Rotation}
-          />
-          <Arrows rotation={priority(this.state) === 1 ? boat1Rotation : boat2Rotation} />
+          /> */}
+          {(p === 1 || p === 2) && <Arrows rotation={p === 1 ? boat1Rotation : boat2Rotation} />}
+          {p === 3 && <DoubleArrows rotation={boat1Rotation} />}
           <RotableWind
             size={0.08}
             distanceFromCenter={windDistance}
@@ -401,20 +494,7 @@ export default class App extends Component {
             type={boat1Type}
             rotation={boat1Rotation}
             sailRotation={boat1SailRotation}
-            onChange={(boat1Rotation) => {
-              const { windDistance, windRotation, boat1Distance } = this.state
-              this.setState({
-                boat1Rotation,
-                boat1WindDistance: computeWindDistance({
-                  windDistance,
-                  windRotation,
-                  boatDistance: boat1Distance,
-                  boatRotation: boat1Rotation,
-                }),
-                boat1SailRotation: computeSailRotation(windRotation, boat1Rotation),
-                boat2SailRotation: computeSailRotation(windRotation, boat2Rotation),
-              })
-            }}
+            onChange={() => null}
             onDoubleTap={() => this.setState({ boat1Type: !boat1Type })}
           />
           <RotableBoat
@@ -424,6 +504,9 @@ export default class App extends Component {
             rotation={boat2Rotation}
             sailRotation={boat2SailRotation}
             onChange={(boat2Rotation) => {
+              const r = rad2deg(boat2Rotation)
+              if (r >= (180 - 35) && r <= (180 + 35)) return
+
               const { windDistance, windRotation, boat2Distance } = this.state
               this.setState({
                 boat2Rotation,
