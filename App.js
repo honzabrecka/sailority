@@ -12,6 +12,7 @@ import SeaVector from './src/SeaVector'
 import WindVector from './src/WindVector'
 
 const TWO_PI = Math.PI * 2
+const D180 = 180
 
 function normalizeRotation(r) {
   return r - (TWO_PI * Math.floor((r + Math.PI) / TWO_PI))
@@ -166,7 +167,6 @@ const rotable = Wrapped => class Rotable extends Component {
     }
 
     handleStartShouldSetPanResponder() {
-      console.log('start')
       this.setState({ tapStart: Date.now() })
       return true
     }
@@ -193,20 +193,16 @@ const rotable = Wrapped => class Rotable extends Component {
       const { onTap, onDoubleTap } = this.props
       const { tapStart, firstTap } = this.state
       const {
-        dx, dy, moveX, moveY, vx, vy,
+        dx, dy, vx, vy,
       } = gestureState
       const now = Date.now()
-      console.log('end', dx, dy, moveX, moveY, vx, vy)
-
       if (dx === 0 && dy === 0
-        // && moveX === 0 && moveY === 0
         && vx === 0 && vy === 0
         && now - tapStart <= 150) {
-        console.log('tap', now - firstTap)
         this.setState({ firstTap: tapStart })
         onTap && onTap()
 
-        if (now - firstTap <= 300) { console.log('ttap'); onDoubleTap && onDoubleTap() }
+        if (now - firstTap <= 300) { onDoubleTap && onDoubleTap() }
       }
     }
 
@@ -347,47 +343,48 @@ function computeSailRotation(windRotation, boatRotation) {
 
 function rad2deg(angle) {
   // <0; 360)
-  return (angle * 57.29577951308232) + 180
+  return (angle * 57.29577951308232) + D180
 }
 
 function sailOrientation(angle) {
-  const r = rad2deg(angle)
+  const rotation = rad2deg(angle)
   // 1 = right
   // 2 = left
-  return (r >= 90 && r <= 180) ? 1 : 2
+  return (rotation >= 90 && rotation <= 180) ? 1 : 2
 }
 
-function priority({
+function priorityFromState({
   boat1Type,
   boat2Type,
-  // boat1Rotation,
   boat2Rotation,
   boat1SailRotation,
   boat2SailRotation,
   boat1WindDistance,
   boat2WindDistance,
 }) {
-  const r = rad2deg(boat2Rotation)
-
-  console.log(r, boat2Rotation)
-
-  if ((r >= (360 - 25) && r <= 360) || (r >= 0 && r <= (0 + 25))) return 3
+  const rotation = rad2deg(boat2Rotation)
+  // against each other
+  if ((rotation >= (360 - 25) && rotation <= 360)
+    || (rotation >= 0 && rotation <= (0 + 25))) return 3
+  // sail boat goes first
   if (boat1Type === MOTOR && boat2Type === SAIL) return 2
+  // sail boat goes first
   if (boat2Type === MOTOR && boat1Type === SAIL) return 1
   if (boat1Type === MOTOR && boat2Type === MOTOR) {
     // boat on the right side goes first
-    return (r > (0 + 25) && r < (180 - 35)) ? 2 : 1
+    return (rotation > (0 + 25) && rotation < (180 - 35)) ? 2 : 1
   }
   if (boat1Type === SAIL && boat2Type === SAIL) {
     const boat1SailOrientation = sailOrientation(boat1SailRotation)
     const boat2SailOrientation = sailOrientation(boat2SailRotation)
-    console.log(rad2deg(boat1SailRotation), rad2deg(boat2SailRotation))
-
+    // boat with wind from right goes first
     if (boat1SailOrientation !== boat2SailOrientation) {
       return boat1SailOrientation === 1 ? 2 : 1
     }
+    // boat farther to wind goes first
     return boat1WindDistance > boat2WindDistance ? 1 : 2
   }
+  // just to please linter/compiler
   return 1
 }
 
@@ -424,15 +421,13 @@ export default class App extends Component {
       boat1SailRotation,
       boat1Type,
       boat1Distance,
-      // boat1WindDistance,
       boat2Rotation,
       boat2SailRotation,
       boat2Type,
       boat2Distance,
-      // boat2WindDistance,
     } = this.state
     const { width, height } = Dimensions.get('window')
-    const p = priority(this.state)
+    const priority = priorityFromState(this.state)
 
     return (
       <View style={styles.container}>
@@ -447,28 +442,24 @@ export default class App extends Component {
             sector
             rotation={Math.PI + ((7 * Math.PI) / 36)}
           />
-          {/* <Circle
-            size={1.1}
-            circle={false}
-            sector
+          {(priority === 1 || priority === 2) && <Arrows
+            rotation={priority === 1 ? boat1Rotation : boat2Rotation}
+          />}
+          {priority === 3 && <DoubleArrows
             rotation={boat1Rotation}
-          />
-          <Circle
-            size={1.1}
-            circle={false}
-            sector
-            rotation={boat2Rotation}
-          /> */}
-          {(p === 1 || p === 2) && <Arrows rotation={p === 1 ? boat1Rotation : boat2Rotation} />}
-          {p === 3 && <DoubleArrows rotation={boat1Rotation} />}
+          />}
           <RotableWind
             size={0.08}
             distanceFromCenter={windDistance}
             rotation={windRotation}
             onChange={(windRotation) => {
               const {
- windDistance, boat1Distance, boat1Rotation, boat2Distance, boat2Rotation,
-} = this.state
+                windDistance,
+                boat1Distance,
+                boat1Rotation,
+                boat2Distance,
+                boat2Rotation,
+              } = this.state
               this.setState({
                 windRotation,
                 boat1WindDistance: computeWindDistance({
@@ -504,9 +495,8 @@ export default class App extends Component {
             rotation={boat2Rotation}
             sailRotation={boat2SailRotation}
             onChange={(boat2Rotation) => {
-              const r = rad2deg(boat2Rotation)
-              if (r >= (180 - 35) && r <= (180 + 35)) return
-
+              const rotation = rad2deg(boat2Rotation)
+              if (rotation >= (D180 - 35) && rotation <= (D180 + 35)) return
               const { windDistance, windRotation, boat2Distance } = this.state
               this.setState({
                 boat2Rotation,
