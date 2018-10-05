@@ -296,10 +296,12 @@ const Boat = ({
   return (
     <View style={boatStyle} {...handlers}>
       <BoatVector width={scaledWidth} height={scaledHeight} color="#ffffff" />
-      {type &&
+      {type
+        && (
         <View style={sailHolderStyle}>
           <View style={sailStyle} />
-        </View>}
+        </View>
+        )}
     </View>
   )
 }
@@ -319,10 +321,9 @@ const ScalableSquare = ({ screenWidth, screenHeight, children }) => {
   }
   return (
     <View style={style}>
-      {React.Children.map(children, child =>
-        child && React.cloneElement(child, {
- scale, center, screenWidth, screenHeight,
-}))}
+      {React.Children.map(children, child => child && React.cloneElement(child, {
+        scale, center, screenWidth, screenHeight,
+      }))}
     </View>
   )
 }
@@ -442,12 +443,16 @@ export default class App extends Component {
             sector
             rotation={Math.PI + ((7 * Math.PI) / 36)}
           />
-          {(priority === 1 || priority === 2) && <Arrows
+          {(priority === 1 || priority === 2) && (
+          <Arrows
             rotation={priority === 1 ? boat1Rotation : boat2Rotation}
-          />}
-          {priority === 3 && <DoubleArrows
+          />
+          )}
+          {priority === 3 && (
+          <DoubleArrows
             rotation={boat1Rotation}
-          />}
+          />
+          )}
           <RotableWind
             size={0.08}
             distanceFromCenter={windDistance}
