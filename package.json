@@ -5,16 +5,16 @@
     "eslint": "eslint src/** App.js"
   },
   "dependencies": {
-    "expo": "^30.0.0",
-    "react": "16.3.1",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz"
+    "expo": "^32.0.0",
+    "react": "16.5.0",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
-    "eslint": "^5.6.1",
+    "eslint": "^5.13.0",
     "eslint-config-airbnb": "^17.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-react": "^7.11.1"
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4"
   }
 }
