@@ -364,14 +364,14 @@ function priorityFromState({
   boat2WindDistance,
 }) {
   const rotation = rad2deg(boat2Rotation)
-  // against each other
-  if ((rotation >= (360 - 25) && rotation <= 360)
-    || (rotation >= 0 && rotation <= (0 + 25))) return 3
   // sail boat goes first
   if (boat1Type === MOTOR && boat2Type === SAIL) return 2
   // sail boat goes first
   if (boat2Type === MOTOR && boat1Type === SAIL) return 1
   if (boat1Type === MOTOR && boat2Type === MOTOR) {
+    // against each other
+    if ((rotation >= (360 - 25) && rotation <= 360)
+      || (rotation >= 0 && rotation <= (0 + 25))) return 3
     // boat on the right side goes first
     return (rotation > (0 + 25) && rotation < (180 - 35)) ? 2 : 1
   }
