@@ -1,3 +1,5 @@
+/* eslint-disable max-classes-per-file, react/jsx-props-no-spreading */
+
 import React, { Component } from 'react'
 import {
   Dimensions,
@@ -140,19 +142,18 @@ const DoubleArrows = ({ scale, center, rotation }) => {
   )
 }
 
-const rotable = Wrapped => class Rotable extends Component {
+const rotable = (Wrapped) => class Rotable extends Component {
     d = Math.PI * 1.5
-
-    state = {
-      tapStart: Date.now(),
-      firstTap: Date.now(),
-    }
 
     constructor(props) {
       super(props)
       this.handleStartShouldSetPanResponder = this.handleStartShouldSetPanResponder.bind(this)
       this.handlePanResponderMove = this.handlePanResponderMove.bind(this)
       this.handlePanResponderEnd = this.handlePanResponderEnd.bind(this)
+      this.state = {
+        tapStart: Date.now(),
+        firstTap: Date.now(),
+      }
     }
 
     componentWillMount() {
@@ -321,7 +322,7 @@ const ScalableSquare = ({ screenWidth, screenHeight, children }) => {
   }
   return (
     <View style={style}>
-      {React.Children.map(children, child => child && React.cloneElement(child, {
+      {React.Children.map(children, (child) => child && React.cloneElement(child, {
         scale, center, screenWidth, screenHeight,
       }))}
     </View>
@@ -405,14 +406,15 @@ const initialState = {
 }
 
 export default class App extends Component {
-  state = ((state) => {
-    const { windRotation, boat1Rotation, boat2Rotation } = state
-    return {
-      ...state,
+  constructor(props) {
+    super(props)
+    const { windRotation, boat1Rotation, boat2Rotation } = initialState
+    this.state = {
+      ...initialState,
       boat1SailRotation: computeSailRotation(windRotation, boat1Rotation),
       boat2SailRotation: computeSailRotation(windRotation, boat2Rotation),
     }
-  })(initialState)
+  }
 
   render() {
     const {
