@@ -5,9 +5,10 @@
     "eslint": "eslint src/** App.js"
   },
   "dependencies": {
-    "expo": "^33.0.0",
+    "expo": "^35.0.0",
     "react": "16.8.3",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz"
+    "react-native": "https://github.com/expo/react-native/archive/sdk-35.0.0.tar.gz",
+    "react-native-svg": "~9.9.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
